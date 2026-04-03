@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matek Feladatsor – 1. osztály</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #FFD93D;
+    --orange: #FF6B35;
+    --blue: #4CC9F0;
+    --teal: #4ECDC4;
+    --pink: #FF6B9D;
+    --green: #06D6A0;
+    --purple: #9B5DE5;
+    --red: #EF233C;
+    --bg: #F0F4FF;
+    --card: #ffffff;
+    --dark: #1A1A2E;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    padding: 24px 16px 48px;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    border-radius: 40px;
+    padding: 6px 18px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: var(--purple);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 12px rgba(155,93,229,0.15);
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 3rem;
+    background: linear-gradient(135deg, var(--orange) 0%, var(--pink) 50%, var(--purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    color: #888;
+    font-weight: 700;
+    margin-top: 6px;
+  }
+
+  /* ===== INFO BAR ===== */
+  .info-bar {
+    display: flex;
+    gap: 12px;
+    max-width: 860px;
+    margin: 0 auto 24px;
+    flex-wrap: wrap;
+  }
+
+  .info-field {
+    flex: 1;
+    min-width: 160px;
+    background: white;
+    border-radius: 14px;
+    padding: 12px 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
+
+  .info-field label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #bbb;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+  }
+
+  .info-field input {
+    width: 100%;
+    border: none;
+    border-bottom: 2.5px solid #E8E8E8;
+    outline: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--dark);
+    background: transparent;
+    padding-bottom: 2px;
+    transition: border-color 0.2s;
+  }
+
+  .info-field input:focus { border-color: var(--purple); }
+
+  /* ===== MAIN LAYOUT ===== */
+  .main {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px 28px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-accent {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .card-accent.green { background: linear-gradient(90deg, var(--green), var(--teal)); }
+  .card-accent.pink { background: linear-gradient(90deg, var(--pink), var(--orange)); }
+  .card-accent.purple { background: linear-gradient(90deg, var(--purple), var(--blue)); }
+  .card-accent.yellow { background: linear-gradient(90deg, var(--yellow), var(--orange)); }
+
+  .card-title {
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 1.25rem;
+    color: var(--dark);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-title .icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+  }
+
+  .icon.green { background: #EDFCF5; }
+  .icon.pink { background: #FFF0F5; }
+  .icon.purple { background: #F3EEFF; }
+  .icon.yellow { background: #FFFBEA; }
+
+  /* ===== NUMBER LINE ===== */
+  .numline {
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    padding: 4px 0 8px;
+    scrollbar-width: thin;
+  }
+
+  .nl-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .nl-num {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 900;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .nl-num.n0, .nl-num.n10, .nl-num.n20 { background: var(--purple); width: 34px; height: 34px; font-size: 0.82rem; }
+  .nl-num.even { background: var(--teal); }
+  .nl-num.odd { background: var(--orange); }
+
+  .nl-line {
+    flex: 1;
+    height: 3px;
+    background: linear-gradient(90deg, #E0E0E0, #D0D0D0);
+    min-width: 8px;
+    flex-shrink: 0;
+  }
+
+  /* ===== TASK GRIDS ===== */
+  .task-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 600px) {
+    .task-grid { grid-template-columns: repeat(2, 1fr); }
+    h1 { font-size: 2.2rem; }
+  }
+
+  .task-item {
+    background: #F8F9FF;
+    border: 2.5px solid #EBEBF5;
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--dark);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+  }
+
+  .task-item:focus-within {
+    border-color: var(--purple);
+    box-shadow: 0 0 0 3px rgba(155,93,229,0.12);
+  }
+
+  .task-item.correct {
+    border-color: var(--green);
+    background: #EDFCF5;
+    animation: popIn 0.3s ease;
+  }
+
+  .task-item.wrong {
+    border-color: var(--red);
+    background: #FFF0F2;
+    animation: shake 0.35s ease;
+  }
+
+  @keyframes popIn {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+
+  .task-input {
+    width: 48px;
+    border: none;
+    border-bottom: 3px solid var(--dark);
+    background: transparent;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: var(--purple);
+    outline: none;
+    text-align: center;
+    padding: 0 2px;
+    transition: border-color 0.2s;
+  }
+
+  .task-input:focus { border-color: var(--purple); }
+  .task-input.correct { color: var(--green); border-color: var(--green); }
+  .task-input.wrong { color: var(--red); border-color: var(--red); }
+
+  .task-feedback {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .task-item.correct .task-feedback { opacity: 1; }
+  .task-item.wrong .task-feedback { opacity: 1; }
+
+  /* Sign selector */
+  .sign-group {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .sign-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 2.5px solid #DDD;
+    background: white;
+    font-size: 1.1rem;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    color: #999;
+  }
+
+  .sign-btn:hover { border-color: var(--purple); color: var(--purple); }
+  .sign-btn.selected-plus { background: var(--green); border-color: var(--green); color: white; }
+  .sign-btn.selected-minus { background: var(--pink); border-color: var(--pink); color: white; }
+  .sign-btn.correct-sign { background: var(--green); border-color: var(--green); color: white; }
+  .sign-btn.wrong-sign { background: var(--red); border-color: var(--red); color: white; }
+
+  /* Word problems */
+  .word-problem {
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .word-problem:nth-child(1) { background: #FFF8EC; border-left: 5px solid var(--yellow); }
+  .word-problem:nth-child(2) { background: #F0FFF8; border-left: 5px solid var(--green); }
+  .word-problem:nth-child(3) { background: #F5F0FF; border-left: 5px solid var(--purple); }
+  .word-problem:nth-child(4) { background: #FFF0F5; border-left: 5px solid var(--pink); }
+
+  .word-text {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  .word-emoji { font-size: 1.5rem; margin-right: 6px; }
+
+  .word-answer-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #888;
+  }
+
+  .word-input {
+    width: 60px;
+    padding: 4px 8px;
+    border: 2.5px solid #DDD;
+    border-radius: 8px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    text-align: center;
+    color: var(--dark);
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .word-input:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(155,93,229,0.1); }
+  .word-input.correct { border-color: var(--green); background: #EDFCF5; color: var(--green); }
+  .word-input.wrong { border-color: var(--red); background: #FFF0F2; color: var(--red); }
+
+  /* ===== ACTIONS ===== */
+  .actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    border-radius: 50px;
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn:active { transform: scale(0.96); }
+
+  .btn-check {
+    background: linear-gradient(135deg, var(--green), var(--teal));
+    color: white;
+    box-shadow: 0 4px 20px rgba(6,214,160,0.35);
+  }
+
+  .btn-check:hover { box-shadow: 0 6px 28px rgba(6,214,160,0.45); transform: translateY(-1px); }
+
+  .btn-new {
+    background: linear-gradient(135deg, var(--purple), #C77DFF);
+    color: white;
+    box-shadow: 0 4px 20px rgba(155,93,229,0.35);
+  }
+
+  .btn-new:hover { box-shadow: 0 6px 28px rgba(155,93,229,0.45); transform: translateY(-1px); }
+
+  .btn-reset {
+    background: white;
+    color: #888;
+    border: 2.5px solid #E8E8E8;
+  }
+
+  .btn-reset:hover { border-color: #CCC; color: var(--dark); }
+
+  /* ===== SCORE PANEL ===== */
+  .score-panel {
+    background: linear-gradient(135deg, var(--purple), #C77DFF, var(--pink));
+    border-radius: 20px;
+    padding: 24px 28px;
+    color: white;
+    display: none;
+    animation: slideUp 0.4s ease;
+  }
+
+  .score-panel.visible { display: block; }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .score-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .score-number {
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 3.5rem;
+    line-height: 1;
+  }
+
+  .score-label {
+    font-size: 0.9rem;
+    opacity: 0.85;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+
+  .score-stars {
+    font-size: 2rem;
+    letter-spacing: 4px;
+  }
+
+  .score-msg {
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 1.4rem;
+    line-height: 1.3;
+  }
+
+  .progress-bar-wrap {
+    background: rgba(255,255,255,0.2);
+    border-radius: 50px;
+    height: 10px;
+    margin-top: 16px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: white;
+    border-radius: 50px;
+    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Confetti */
+  .confetti-wrap {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+  }
+
+  .confetti-piece {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: -20px;
+    border-radius: 2px;
+    animation: confettiFall linear forwards;
+  }
+
+  @keyframes confettiFall {
+    to {
+      transform: translateY(110vh) rotate(720deg);
+      opacity: 0;
+    }
+  }
+
+  /* Fade in on new generation */
+  .card { animation: fadeIn 0.35s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .divider {
+    border: none;
+    border-top: 2px dashed #EEE;
+    margin: 4px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="confetti-wrap" id="confettiWrap"></div>
+
+<header class="header">
+  <div class="header-badge">✏️ 1. Osztály &nbsp;•&nbsp; Matematika</div>
+  <h1>Matek Feladatsor</h1>
+  <div class="subtitle">Összeadás &amp; Kivonás • 20-as számkör</div>
+</header>
+
+<div class="info-bar">
+  <div class="info-field"><label>Név</label><input type="text" placeholder="Írd ide a neved…"></div>
+  <div class="info-field"><label>Dátum</label><input type="text" placeholder="pl. 2025. 03. 15."></div>
+  <div class="info-field"><label>Osztály</label><input type="text" placeholder="pl. 1/A"></div>
+</div>
+
+<div class="main">
+
+  <!-- Number line -->
+  <div class="card">
+    <div class="card-accent purple"></div>
+    <div class="card-title"><span class="icon purple">🔢</span> Számegyenes</div>
+    <div class="numline">
+      <div class="nl-item"><div class="nl-num n0">0</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num odd">1</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num even">2</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num odd">3</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num even">4</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num odd">5</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num even">6</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num odd">7</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num even">8</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num odd">9</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num n10">10</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num odd">11</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num even">12</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num odd">13</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num even">14</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num odd">15</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num even">16</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num odd">17</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num even">18</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num odd">19</div></div>
+      <div class="nl-line"></div>
+      <div class="nl-item"><div class="nl-num n20">20</div></div>
+    </div>
+  </div>
+
+  <!-- Addition -->
+  <div class="card">
+    <div class="card-accent green"></div>
+    <div class="card-title"><span class="icon green">➕</span> Összeadás</div>
+    <div class="task-grid" id="addGrid"></div>
+  </div>
+
+  <!-- Subtraction -->
+  <div class="card">
+    <div class="card-accent pink"></div>
+    <div class="card-title"><span class="icon pink">➖</span> Kivonás</div>
+    <div class="task-grid" id="subGrid"></div>
+  </div>
+
+  <!-- Mixed sign -->
+  <div class="card">
+    <div class="card-accent purple"></div>
+    <div class="card-title"><span class="icon purple">🔀</span> Melyik a jel? &nbsp;<span style="font-size:0.9rem;font-weight:700;color:#aaa">( + vagy − )</span></div>
+    <div class="task-grid" id="mixGrid" style="grid-template-columns: repeat(2, 1fr);"></div>
+  </div>
+
+  <!-- Word problems -->
+  <div class="card">
+    <div class="card-accent yellow"></div>
+    <div class="card-title"><span class="icon yellow">📖</span> Szöveges feladatok</div>
+    <div id="wordProblems"></div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="btn btn-check" onclick="checkAll()">✅ Ellenőrzés</button>
+    <button class="btn btn-new" onclick="generateAll()">🎲 Új feladatsor</button>
+    <button class="btn btn-reset" onclick="resetAll()">🔄 Törlés</button>
+  </div>
+
+  <!-- Score -->
+  <div class="score-panel" id="scorePanel">
+    <div class="score-inner">
+      <div>
+        <div class="score-number" id="scoreNum">0/34</div>
+        <div class="score-label">helyes válasz</div>
+      </div>
+      <div>
+        <div class="score-stars" id="scoreStars">⭐⭐⭐</div>
+        <div class="score-msg" id="scoreMsg">Szuper!</div>
+      </div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressFill" style="width: 0%"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===== DATA =====
+let addTasks = [];
+let subTasks = [];
+let mixTasks = [];
+let wordTasks = [];
+
+const wordTemplates = [
+  { emoji: '🍎', gen: () => { const a=rnd(1,12),b=rnd(1,12-a+1); return { text: `Pistának van ${a} almája. Kapott még ${b}-t/öt/et. Hány almája van most összesen?`, answer: a+b, unit: 'alma' }; } },
+  { emoji: '🐦', gen: () => { const a=rnd(5,18),b=rnd(1,a-1); return { text: `A fán ült ${a} madár. Elrepült belőlük ${b}. Hány madár maradt a fán?`, answer: a-b, unit: 'madár' }; } },
+  { emoji: '🍬', gen: () => { const a=rnd(3,10),b=rnd(3,20-a); return { text: `Annának volt ${a} cukorkája, Bélának ${b}. Összesen hány cukorka van nekik?`, answer: a+b, unit: 'cukorka' }; } },
+  { emoji: '⚽', gen: () => { const a=rnd(5,20),b=rnd(1,a-1); return { text: `A focicsapatban ${a} gyerek volt. Hazament ${b}. Hány gyerek maradt?`, answer: a-b, unit: 'gyerek' }; } },
+  { emoji: '🌸', gen: () => { const a=rnd(2,10),b=rnd(2,20-a); return { text: `Kati ${a} virágot szedett, Móni ${b}-t/öt/et. Hány virágot szedtek összesen?`, answer: a+b, unit: 'virág' }; } },
+  { emoji: '🐟', gen: () => { const a=rnd(8,20),b=rnd(1,a-2); return { text: `Az akváriumban ${a} hal úszkált. Kivettem ${b}-t/öt/et. Hány hal maradt?`, answer: a-b, unit: 'hal' }; } },
+  { emoji: '🚗', gen: () => { const a=rnd(3,10),b=rnd(3,20-a); return { text: `A parkolóban ${a} piros és ${b} kék autó állt. Hány autó volt összesen?`, answer: a+b, unit: 'autó' }; } },
+  { emoji: '🍕', gen: () => { const a=rnd(8,16),b=rnd(2,a-1); return { text: `A pizzából volt ${a} szelet. Megettük ${b} szeletet. Hány szelet maradt?`, answer: a-b, unit: 'szelet' }; } },
+  { emoji: '🐢', gen: () => { const a=rnd(4,12),b=rnd(2,20-a); return { text: `Az egyik tóban ${a} teknős élt, a másikban ${b}. Összesen hány teknős van?`, answer: a+b, unit: 'teknős' }; } },
+  { emoji: '🎈', gen: () => { const a=rnd(10,20),b=rnd(1,a-2); return { text: `Volt ${a} léggömb. Elszállt ${b}. Hány léggömb maradt?`, answer: a-b, unit: 'léggömb' }; } },
+];
+
+function rnd(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// ===== GENERATORS =====
+function genAdd(count = 12) {
+  const tasks = [];
+  for (let i = 0; i < count; i++) {
+    let a, b;
+    do {
+      a = rnd(1, 15);
+      b = rnd(1, 20 - a);
+    } while (a + b > 20);
+    tasks.push({ a, b, op: '+', answer: a + b });
+  }
+  return tasks;
+}
+
+function genSub(count = 12) {
+  const tasks = [];
+  for (let i = 0; i < count; i++) {
+    const result = rnd(0, 15);
+    const b = rnd(1, 20 - result);
+    const a = result + b;
+    tasks.push({ a, b, op: '−', answer: result });
+  }
+  return tasks;
+}
+
+function genMix(count = 6) {
+  const tasks = [];
+  for (let i = 0; i < count; i++) {
+    const isAdd = Math.random() > 0.5;
+    let a, b, answer, op;
+    if (isAdd) {
+      a = rnd(1, 14); b = rnd(1, 20 - a); answer = a + b; op = '+';
+    } else {
+      answer = rnd(0, 14); b = rnd(1, 20 - answer); a = answer + b; op = '−';
+    }
+    tasks.push({ a, b, op, answer, result: answer });
+  }
+  return tasks;
+}
+
+function genWords(count = 4) {
+  const shuffled = [...wordTemplates].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count).map(t => t.gen());
+}
+
+// ===== RENDER =====
+function renderAdd() {
+  const grid = document.getElementById('addGrid');
+  grid.innerHTML = addTasks.map((t, i) => `
+    <div class="task-item" id="add-${i}">
+      ${t.a} + ${t.b} =
+      <input class="task-input" type="number" min="0" max="20" id="add-inp-${i}" placeholder="?" onkeydown="handleEnter(event, 'add-inp-${i+1}')">
+      <span class="task-feedback" id="add-fb-${i}"></span>
+    </div>`).join('');
+}
+
+function renderSub() {
+  const grid = document.getElementById('subGrid');
+  grid.innerHTML = subTasks.map((t, i) => `
+    <div class="task-item" id="sub-${i}">
+      ${t.a} − ${t.b} =
+      <input class="task-input" type="number" min="0" max="20" id="sub-inp-${i}" placeholder="?" onkeydown="handleEnter(event, 'sub-inp-${i+1}')">
+      <span class="task-feedback" id="sub-fb-${i}"></span>
+    </div>`).join('');
+}
+
+function renderMix() {
+  const grid = document.getElementById('mixGrid');
+  grid.innerHTML = mixTasks.map((t, i) => `
+    <div class="task-item" id="mix-${i}" style="flex-wrap:wrap; gap:4px;">
+      <span>${t.a}</span>
+      <div class="sign-group">
+        <button class="sign-btn" id="mix-plus-${i}" onclick="selectSign(${i}, '+')" title="összeadás">+</button>
+        <button class="sign-btn" id="mix-minus-${i}" onclick="selectSign(${i}, '−')" title="kivonás">−</button>
+      </div>
+      <span>${t.b} = ${t.a + (t.op === '+' ? t.b : -t.b) < 0 ? '?' : (t.op === '+' ? t.a + t.b : t.a - t.b)}</span>
+      <span class="task-feedback" id="mix-fb-${i}" style="position:static;opacity:1;display:none;"></span>
+    </div>`).join('');
+
+  // Fix display of result
+  mixTasks.forEach((t, i) => {
+    const el = document.getElementById(`mix-${i}`);
+    const spans = el.querySelectorAll('span');
+    spans[0].textContent = t.a;
+    // last span = result
+    spans[spans.length - 2].textContent = `= ${t.a + (t.op === '+' ? t.b : -t.b)}`;
+  });
+}
+
+function renderWords() {
+  const container = document.getElementById('wordProblems');
+  container.innerHTML = wordTasks.map((t, i) => `
+    <div class="word-problem" id="word-${i}">
+      <div class="word-text"><span class="word-emoji">${wordTemplates.find(w => true) ? getEmoji(i) : '🌟'}</span>${t.text}</div>
+      <div class="word-answer-row">
+        Válasz:
+        <input class="word-input" type="number" min="0" max="20" id="word-inp-${i}" placeholder="?">
+        <span id="word-unit-${i}">${t.unit}</span>
+        <span id="word-fb-${i}" style="font-size:1.1rem"></span>
+      </div>
+    </div>`).join('');
+}
+
+const emojiList = ['🍎','🐦','🍬','⚽','🌸','🐟','🚗','🍕','🐢','🎈'];
+function getEmoji(i) { return emojiList[i % emojiList.length]; }
+
+// Rerender mix with proper result display
+function renderMixFixed() {
+  const grid = document.getElementById('mixGrid');
+  grid.innerHTML = mixTasks.map((t, i) => {
+    const result = t.op === '+' ? t.a + t.b : t.a - t.b;
+    return `
+    <div class="task-item" id="mix-${i}">
+      <span style="font-size:1.3rem;font-weight:900;">${t.a}</span>
+      <div class="sign-group">
+        <button class="sign-btn" id="mix-plus-${i}" onclick="selectSign(${i}, '+')" title="+">+</button>
+        <button class="sign-btn" id="mix-minus-${i}" onclick="selectSign(${i}, '−')" title="−">−</button>
+      </div>
+      <span style="font-size:1.3rem;font-weight:900;">${t.b} = ${result}</span>
+      <span class="task-feedback" id="mix-fb-${i}"></span>
+    </div>`;
+  }).join('');
+}
+
+function selectSign(i, sign) {
+  const plusBtn = document.getElementById(`mix-plus-${i}`);
+  const minusBtn = document.getElementById(`mix-minus-${i}`);
+  plusBtn.className = 'sign-btn' + (sign === '+' ? ' selected-plus' : '');
+  minusBtn.className = 'sign-btn' + (sign === '−' ? ' selected-minus' : '');
+  mixTasks[i].selected = sign;
+  // clear feedback
+  const fb = document.getElementById(`mix-fb-${i}`);
+  fb.textContent = '';
+  document.getElementById(`mix-${i}`).classList.remove('correct','wrong');
+}
+
+// ===== MAIN GENERATE =====
+function generateAll() {
+  addTasks = genAdd(12);
+  subTasks = genSub(12);
+  mixTasks = genMix(6);
+  wordTasks = genWords(4);
+
+  renderAdd();
+  renderSub();
+  renderMixFixed();
+  renderWords();
+
+  document.getElementById('scorePanel').classList.remove('visible');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===== CHECK =====
+function checkAll() {
+  let correct = 0;
+  let total = 0;
+
+  // Addition
+  addTasks.forEach((t, i) => {
+    const inp = document.getElementById(`add-inp-${i}`);
+    const box = document.getElementById(`add-${i}`);
+    const fb = document.getElementById(`add-fb-${i}`);
+    total++;
+    const val = parseInt(inp.value);
+    if (inp.value === '' ) {
+      box.classList.remove('correct','wrong');
+      inp.classList.remove('correct','wrong');
+      fb.textContent = '';
+    } else if (val === t.answer) {
+      box.classList.add('correct'); box.classList.remove('wrong');
+      inp.classList.add('correct'); inp.classList.remove('wrong');
+      fb.textContent = '✅'; correct++;
+    } else {
+      box.classList.add('wrong'); box.classList.remove('correct');
+      inp.classList.add('wrong'); inp.classList.remove('correct');
+      fb.textContent = '❌';
+    }
+  });
+
+  // Subtraction
+  subTasks.forEach((t, i) => {
+    const inp = document.getElementById(`sub-inp-${i}`);
+    const box = document.getElementById(`sub-${i}`);
+    const fb = document.getElementById(`sub-fb-${i}`);
+    total++;
+    const val = parseInt(inp.value);
+    if (inp.value === '') {
+      box.classList.remove('correct','wrong');
+      inp.classList.remove('correct','wrong');
+      fb.textContent = '';
+    } else if (val === t.answer) {
+      box.classList.add('correct'); box.classList.remove('wrong');
+      inp.classList.add('correct'); inp.classList.remove('wrong');
+      fb.textContent = '✅'; correct++;
+    } else {
+      box.classList.add('wrong'); box.classList.remove('correct');
+      inp.classList.add('wrong'); inp.classList.remove('correct');
+      fb.textContent = '❌';
+    }
+  });
+
+  // Mix
+  mixTasks.forEach((t, i) => {
+    const box = document.getElementById(`mix-${i}`);
+    const fb = document.getElementById(`mix-fb-${i}`);
+    const plusBtn = document.getElementById(`mix-plus-${i}`);
+    const minusBtn = document.getElementById(`mix-minus-${i}`);
+    total++;
+    if (!t.selected) return;
+    if (t.selected === t.op) {
+      box.classList.add('correct'); box.classList.remove('wrong');
+      fb.textContent = '✅'; correct++;
+      if (t.op === '+') plusBtn.className = 'sign-btn correct-sign';
+      else minusBtn.className = 'sign-btn correct-sign';
+    } else {
+      box.classList.add('wrong'); box.classList.remove('correct');
+      fb.textContent = '❌';
+      if (t.selected === '+') plusBtn.className = 'sign-btn wrong-sign';
+      else minusBtn.className = 'sign-btn wrong-sign';
+    }
+  });
+
+  // Words
+  wordTasks.forEach((t, i) => {
+    const inp = document.getElementById(`word-inp-${i}`);
+    const fb = document.getElementById(`word-fb-${i}`);
+    total++;
+    const val = parseInt(inp.value);
+    if (inp.value === '') { inp.classList.remove('correct','wrong'); fb.textContent = ''; return; }
+    if (val === t.answer) {
+      inp.classList.add('correct'); inp.classList.remove('wrong');
+      fb.textContent = '✅'; correct++;
+    } else {
+      inp.classList.add('wrong'); inp.classList.remove('correct');
+      fb.textContent = '❌';
+    }
+  });
+
+  // Show score
+  const answered = addTasks.filter((_,i) => document.getElementById(`add-inp-${i}`).value !== '').length
+    + subTasks.filter((_,i) => document.getElementById(`sub-inp-${i}`).value !== '').length
+    + mixTasks.filter(t => t.selected).length
+    + wordTasks.filter((_,i) => document.getElementById(`word-inp-${i}`).value !== '').length;
+
+  const panel = document.getElementById('scorePanel');
+  document.getElementById('scoreNum').textContent = `${correct} / ${answered}`;
+  const pct = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+  setTimeout(() => {
+    document.getElementById('progressFill').style.width = pct + '%';
+  }, 100);
+
+  let stars = '⭐';
+  let msg = 'Próbáld újra! 💪';
+  if (pct >= 90) { stars = '⭐⭐⭐'; msg = 'Fantasztikus! 🎉'; }
+  else if (pct >= 70) { stars = '⭐⭐'; msg = 'Nagyon jó! 👏'; }
+  else if (pct >= 50) { stars = '⭐'; msg = 'Jó munka! 😊'; }
+
+  document.getElementById('scoreStars').textContent = stars;
+  document.getElementById('scoreMsg').textContent = msg;
+  panel.classList.add('visible');
+
+  if (pct >= 90 && answered >= 10) launchConfetti();
+
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ===== RESET =====
+function resetAll() {
+  document.querySelectorAll('.task-input, .word-input').forEach(inp => {
+    inp.value = '';
+    inp.classList.remove('correct','wrong');
+  });
+  document.querySelectorAll('.task-item, .word-problem').forEach(el => {
+    el.classList.remove('correct','wrong');
+  });
+  document.querySelectorAll('.task-feedback').forEach(fb => fb.textContent = '');
+  document.querySelectorAll('#word-fb-0,#word-fb-1,#word-fb-2,#word-fb-3').forEach(fb => { if(fb) fb.textContent = ''; });
+  document.querySelectorAll('[id^="word-fb-"]').forEach(fb => fb.textContent = '');
+  document.querySelectorAll('.sign-btn').forEach(btn => {
+    btn.className = 'sign-btn';
+  });
+  mixTasks.forEach(t => delete t.selected);
+  document.getElementById('scorePanel').classList.remove('visible');
+}
+
+// ===== CONFETTI =====
+function launchConfetti() {
+  const wrap = document.getElementById('confettiWrap');
+  wrap.innerHTML = '';
+  const colors = ['#FFD93D','#FF6B35','#4CC9F0','#06D6A0','#FF6B9D','#9B5DE5','#4ECDC4'];
+  for (let i = 0; i < 80; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.cssText = `
+      left: ${Math.random() * 100}%;
+      background: ${colors[Math.floor(Math.random() * colors.length)]};
+      width: ${6 + Math.random() * 8}px;
+      height: ${6 + Math.random() * 8}px;
+      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+      animation-duration: ${1.5 + Math.random() * 2}s;
+      animation-delay: ${Math.random() * 0.8}s;
+    `;
+    wrap.appendChild(piece);
+  }
+  setTimeout(() => { wrap.innerHTML = ''; }, 4000);
+}
+
+// ===== ENTER KEY =====
+function handleEnter(e, nextId) {
+  if (e.key === 'Enter') {
+    const next = document.getElementById(nextId);
+    if (next) next.focus();
+  }
+}
+
+// ===== INIT =====
+generateAll();
+</script>
+</body>
+</html>
