@@ -862,7 +862,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ===== SETTINGS =====
-let cfg = { min: 0, max: 20, neg: false };
+const _savedCfg = JSON.parse(localStorage.getItem('matek-cfg') || 'null');
+let cfg = _savedCfg || { min: 0, max: 20, neg: false };
 
 function getMin() { return cfg.neg ? cfg.min : Math.max(0, cfg.min); }
 function getMax() { return cfg.max; }
@@ -883,6 +884,7 @@ function applySettings() {
     return;
   }
   cfg = { min: mn, max: mx, neg };
+  localStorage.setItem('matek-cfg', JSON.stringify(cfg));
   updateSubtitle();
   generateAll();
 }
@@ -1261,6 +1263,11 @@ function handleEnter(e, nextId) {
 }
 
 // ===== INIT =====
+// Restore saved settings into inputs
+document.getElementById('settingMin').value = cfg.min;
+document.getElementById('settingMax').value = cfg.max;
+document.getElementById('settingNeg').checked = cfg.neg;
+updateSubtitle();
 generateAll();
 </script>
 </body>
