@@ -36,24 +36,24 @@
   }
 
   [data-theme="dark"] {
-    --bg: #0F1117;
-    --card: #1A1D2E;
+    --bg: #1C1F2E;
+    --card: #262A3D;
     --dark: #E8EAFF;
-    --text-muted: #7B7F9E;
-    --border: #2E3150;
-    --task-bg: #12152A;
-    --task-border: #2A2D4A;
-    --label-color: #5A5E7E;
-    --divider: #2A2D4A;
-    --word1-bg: #1E1A0D;
-    --word2-bg: #0D1E18;
-    --word3-bg: #160D2E;
-    --word4-bg: #1E0D18;
-    --icon-green-bg: #0D2018;
-    --icon-pink-bg: #2E0D18;
-    --icon-purple-bg: #180D2E;
-    --icon-yellow-bg: #2E280D;
-    --shadow: rgba(0,0,0,0.3);
+    --text-muted: #9B9FBE;
+    --border: #3E4265;
+    --task-bg: #1E2135;
+    --task-border: #3A3E60;
+    --label-color: #7A7EA0;
+    --divider: #3A3E60;
+    --word1-bg: #2E2810;
+    --word2-bg: #122A20;
+    --word3-bg: #221040;
+    --word4-bg: #2E1020;
+    --icon-green-bg: #0D2D1E;
+    --icon-pink-bg: #3A1020;
+    --icon-purple-bg: #201040;
+    --icon-yellow-bg: #3A3210;
+    --shadow: rgba(0,0,0,0.25);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -501,6 +501,11 @@
   .task-input:focus         { border-color: var(--purple); }
   .task-input.correct       { color: var(--green); border-color: var(--green); }
   .task-input.wrong         { color: var(--red);   border-color: var(--red); }
+
+  /* Spinner arrows visible in dark mode */
+  [data-theme="dark"] input[type="number"] {
+    color-scheme: dark;
+  }
 
   .task-feedback {
     position: absolute;
