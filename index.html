@@ -976,16 +976,19 @@ function genMix(count = 6) {
   const mn = getMin(), mx = getMax();
   for (let i = 0; i < count; i++) {
     const isAdd = Math.random() > 0.5;
-    let a, b, answer, op;
-    if (isAdd) {
-      a = rnd(mn, mx);
-      b = rnd(mn, mx - (a > 0 ? a : 0));
-      answer = a + b; op = '+';
-    } else {
-      a = rnd(mn, mx); b = rnd(mn, mx);
-      if (!cfg.neg && a < b) [a, b] = [b, a];
-      answer = a - b; op = '−';
-    }
+    let a, b, answer, op, tries = 0;
+    do {
+      if (isAdd) {
+        a = rnd(mn, mx);
+        b = rnd(mn, mx - (a > 0 ? a : 0));
+        answer = a + b; op = '+';
+      } else {
+        a = rnd(mn, mx); b = rnd(mn, mx);
+        if (!cfg.neg && a < b) [a, b] = [b, a];
+        answer = a - b; op = '−';
+      }
+      tries++;
+    } while (b === 0 && tries < 50); // b=0 esetén mindkét jel helyes lenne, elkerüljük
     tasks.push({ a, b, op, answer });
   }
   return tasks;
@@ -1130,7 +1133,7 @@ function checkSection(section) {
     mixTasks.forEach((t, i) => {
       if (!t.selected) return;
       total++;
-      const ok = t.selected === t.op;
+      const ok = t.selected === t.op || t.b === 0; // ha b=0, mindkét jel helyes
       const box = document.getElementById(`mix-${i}`);
       const fb  = document.getElementById(`mix-fb-${i}`);
       const plusBtn  = document.getElementById(`mix-plus-${i}`);
@@ -1201,7 +1204,7 @@ function checkAll() {
   });
   mixTasks.forEach(t => {
     if (!t.selected) return; answered++;
-    if (t.selected === t.op) correct++;
+    if (t.selected === t.op || t.b === 0) correct++;
   });
   wordTasks.forEach((t, i) => {
     const v = document.getElementById(`word-inp-${i}`).value;
