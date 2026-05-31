@@ -301,6 +301,7 @@
   .card-accent.pink   { background: linear-gradient(90deg, var(--pink), var(--orange)); }
   .card-accent.purple { background: linear-gradient(90deg, var(--purple), var(--blue)); }
   .card-accent.yellow { background: linear-gradient(90deg, var(--yellow), var(--orange)); }
+  .card-accent.blue   { background: linear-gradient(90deg, var(--blue), var(--teal)); }
 
   .card-header {
     display: flex;
@@ -339,6 +340,7 @@
   .icon.pink   { background: var(--icon-pink-bg); }
   .icon.purple { background: var(--icon-purple-bg); }
   .icon.yellow { background: var(--icon-yellow-bg); }
+  .icon.blue   { background: var(--icon-green-bg); }
 
   .card-score {
     font-size: 0.85rem;
@@ -718,7 +720,7 @@
 
 <div class="info-bar">
   <div class="info-field"><label>Név</label><input type="text" placeholder="Írd ide a neved…"></div>
-  <div class="info-field"><label>Dátum</label><input type="text" placeholder="pl. 2025. 03. 15."></div>
+  <div class="info-field"><label>Dátum</label><input type="text" id="dateField" placeholder="pl. 2025. 03. 15."></div>
   <div class="info-field"><label>Osztály</label><input type="text" placeholder="pl. 1/A"></div>
 </div>
 
@@ -740,6 +742,10 @@
       <label class="settings-checkbox">
         <input type="checkbox" id="settingNeg">
         Negatív számok engedélyezése
+      </label>
+      <label class="settings-checkbox">
+        <input type="checkbox" id="settingCross">
+        🔟 10-es átlépés gyakorlása
       </label>
       <button class="settings-apply" onclick="applySettings()">✔ Alkalmaz &amp; Újragenerál</button>
     </div>
@@ -797,6 +803,20 @@
       </div>
     </div>
     <div class="task-grid" id="mixGrid" style="grid-template-columns: repeat(2, 1fr);"></div>
+  </div>
+
+  <!-- Open sentences -->
+  <div class="card">
+    <div class="card-accent blue"></div>
+    <div class="card-header">
+      <div class="card-title"><span class="icon blue">📦</span> Nyitott mondatok &nbsp;<span style="font-size:0.9rem;font-weight:700;color:var(--text-muted)">( mi hiányzik? )</span></div>
+      <div class="card-actions">
+        <span class="card-score" id="open-score"></span>
+        <button class="btn-sm btn-sm-check" onclick="checkSection('open')">✅ Ellenőrzés</button>
+        <button class="btn-sm btn-sm-new" onclick="regenSection('open')">🎲 Újra</button>
+      </div>
+    </div>
+    <div class="task-grid" id="openGrid"></div>
   </div>
 
   <!-- Word problems -->
@@ -863,7 +883,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ===== SETTINGS =====
 const _savedCfg = JSON.parse(localStorage.getItem('matek-cfg') || 'null');
-let cfg = _savedCfg || { min: 0, max: 20, neg: false };
+let cfg = Object.assign({ min: 0, max: 20, neg: false, cross: false }, _savedCfg || {});
 
 function getMin() { return cfg.neg ? cfg.min : Math.max(0, cfg.min); }
 function getMax() { return cfg.max; }
@@ -879,67 +899,42 @@ function applySettings() {
   const mn = parseInt(document.getElementById('settingMin').value);
   const mx = parseInt(document.getElementById('settingMax').value);
   const neg = document.getElementById('settingNeg').checked;
+  const cross = document.getElementById('settingCross').checked;
   if (isNaN(mn) || isNaN(mx) || mn >= mx) {
     alert('A minimum számnak kisebbnek kell lennie a maximumnál!');
     return;
   }
-  cfg = { min: mn, max: mx, neg };
+  cfg = { min: mn, max: mx, neg, cross };
   localStorage.setItem('matek-cfg', JSON.stringify(cfg));
   updateSubtitle();
   generateAll();
 }
 
 function updateSubtitle() {
-  const negStr = cfg.neg ? ' (negatív számokkal)' : '';
+  const extras = [];
+  if (cfg.neg) extras.push('negatív számokkal');
+  if (cfg.cross) extras.push('10-es átlépéssel');
+  const extraStr = extras.length ? ' (' + extras.join(', ') + ')' : '';
   document.getElementById('subtitleEl').textContent =
-    `Összeadás & Kivonás • ${cfg.min}–${cfg.max}-es számkör${negStr}`;
+    `Összeadás & Kivonás • ${cfg.min}–${cfg.max}-es számkör${extraStr}`;
 }
 
 // ===== DATA =====
-let addTasks = [], subTasks = [], mixTasks = [], wordTasks = [];
+let addTasks = [], subTasks = [], mixTasks = [], openTasks = [], wordTasks = [];
 
-// Word templates – emoji is stored separately and passed into the generated task
+// Word templates – the numbers (a, b) are generated centrally (so the
+// "10-es átlépés" setting applies), and each template builds its own text.
 const wordTemplates = [
-  { emoji: '🍎', gen: (mn, mx) => {
-    const a = rnd(1, Math.min(12, mx)), b = rnd(1, Math.min(8, mx - a));
-    return { text: `Pistának van ${a} almája. Kapott még ${b} almát. Hány almája van most összesen?`, answer: a + b, unit: 'alma' };
-  }},
-  { emoji: '🐦', gen: (mn, mx) => {
-    const a = rnd(Math.max(3, mn + 2), mx), b = rnd(1, a - 1);
-    return { text: `A fán ült ${a} madár. Elrepült belőlük ${b}. Hány madár maradt a fán?`, answer: a - b, unit: 'madár' };
-  }},
-  { emoji: '🍬', gen: (mn, mx) => {
-    const a = rnd(1, Math.min(10, mx)), b = rnd(1, Math.min(10, mx - a));
-    return { text: `Annának volt ${a} cukorkája, Bélának ${b}. Összesen hány cukorka van nekik?`, answer: a + b, unit: 'cukorka' };
-  }},
-  { emoji: '⚽', gen: (mn, mx) => {
-    const a = rnd(Math.max(3, mn + 2), mx), b = rnd(1, a - 1);
-    return { text: `A focicsapatban ${a} gyerek volt. Hazament ${b}. Hány gyerek maradt?`, answer: a - b, unit: 'gyerek' };
-  }},
-  { emoji: '🌸', gen: (mn, mx) => {
-    const a = rnd(1, Math.min(10, mx)), b = rnd(1, Math.min(10, mx - a));
-    return { text: `Kati ${a} virágot szedett, Móni ${b} virágot. Hány virágot szedtek összesen?`, answer: a + b, unit: 'virág' };
-  }},
-  { emoji: '🐟', gen: (mn, mx) => {
-    const a = rnd(Math.max(4, mn + 2), mx), b = rnd(1, a - 2);
-    return { text: `Az akváriumban ${a} hal úszkált. Kivettem ${b} halat. Hány hal maradt?`, answer: a - b, unit: 'hal' };
-  }},
-  { emoji: '🚗', gen: (mn, mx) => {
-    const a = rnd(1, Math.min(10, mx)), b = rnd(1, Math.min(10, mx - a));
-    return { text: `A parkolóban ${a} piros és ${b} kék autó állt. Hány autó volt összesen?`, answer: a + b, unit: 'autó' };
-  }},
-  { emoji: '🍕', gen: (mn, mx) => {
-    const a = rnd(Math.max(4, mn + 2), mx), b = rnd(1, a - 1);
-    return { text: `A pizzából volt ${a} szelet. Megettük ${b} szeletet. Hány szelet maradt?`, answer: a - b, unit: 'szelet' };
-  }},
-  { emoji: '🐢', gen: (mn, mx) => {
-    const a = rnd(1, Math.min(10, mx)), b = rnd(1, Math.min(10, mx - a));
-    return { text: `Az egyik tóban ${a} teknős élt, a másikban ${b}. Összesen hány teknős van?`, answer: a + b, unit: 'teknős' };
-  }},
-  { emoji: '🎈', gen: (mn, mx) => {
-    const a = rnd(Math.max(4, mn + 2), mx), b = rnd(1, a - 2);
-    return { text: `Volt ${a} léggömb. Elszállt ${b}. Hány léggömb maradt?`, answer: a - b, unit: 'léggömb' };
-  }},
+  { emoji: '🍎', op: '+', build: (a, b) => ({ text: `Pistának van ${a} almája. Kapott még ${b} almát. Hány almája van most összesen?`, answer: a + b, unit: 'alma' }) },
+  { emoji: '🍬', op: '+', build: (a, b) => ({ text: `Annának volt ${a} cukorkája, Bélának ${b}. Összesen hány cukorka van nekik?`, answer: a + b, unit: 'cukorka' }) },
+  { emoji: '🌸', op: '+', build: (a, b) => ({ text: `Kati ${a} virágot szedett, Móni ${b} virágot. Hány virágot szedtek összesen?`, answer: a + b, unit: 'virág' }) },
+  { emoji: '🚗', op: '+', build: (a, b) => ({ text: `A parkolóban ${a} piros és ${b} kék autó állt. Hány autó volt összesen?`, answer: a + b, unit: 'autó' }) },
+  { emoji: '🐢', op: '+', build: (a, b) => ({ text: `Az egyik tóban ${a} teknős élt, a másikban ${b}. Összesen hány teknős van?`, answer: a + b, unit: 'teknős' }) },
+  { emoji: '🐦', op: '−', build: (a, b) => ({ text: `A fán ült ${a} madár. Elrepült belőlük ${b}. Hány madár maradt a fán?`, answer: a - b, unit: 'madár' }) },
+  { emoji: '⚽', op: '−', build: (a, b) => ({ text: `A focicsapatban ${a} gyerek volt. Hazament ${b}. Hány gyerek maradt?`, answer: a - b, unit: 'gyerek' }) },
+  { emoji: '🐟', op: '−', build: (a, b) => ({ text: `Az akváriumban ${a} hal úszkált. Kivettem ${b} halat. Hány hal maradt?`, answer: a - b, unit: 'hal' }) },
+  { emoji: '🍕', op: '−', build: (a, b) => ({ text: `A pizzából volt ${a} szelet. Megettük ${b} szeletet. Hány szelet maradt?`, answer: a - b, unit: 'szelet' }) },
+  { emoji: '🎈', op: '−', build: (a, b) => ({ text: `Volt ${a} léggömb. Elszállt ${b}. Hány léggömb maradt?`, answer: a - b, unit: 'léggömb' }) },
 ];
 
 function rnd(min, max) {
@@ -947,13 +942,43 @@ function rnd(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+// ===== NUMBER PAIR HELPERS =====
+// "10-es átlépés" (crossing ten): when adding, the ones digits sum to ≥10 so we
+// carry over into the next ten; when subtracting, the top ones digit is smaller
+// so we must borrow, crossing a ten downwards. Falls back to a plain pair if no
+// crossing pair fits the chosen range.
+function makeAddPair(mn, mx, cross) {
+  if (cross) {
+    for (let t = 0; t < 200; t++) {
+      const a = rnd(Math.max(1, mn), mx - 1);
+      const b = rnd(1, mx - a);
+      if (b >= 1 && (a % 10) + (b % 10) > 10 && a + b <= mx) return { a, b };
+    }
+  }
+  const a = rnd(mn, mx);
+  const b = rnd(mn, mx - (a > 0 ? a : 0));
+  return { a, b };
+}
+
+function makeSubPair(mn, mx, cross) {
+  if (cross) {
+    for (let t = 0; t < 200; t++) {
+      const a = rnd(Math.max(1, mn + 1), mx);
+      const b = rnd(1, a - mn);
+      if (b >= 1 && (a % 10) < (b % 10) && a - b >= mn) return { a, b };
+    }
+  }
+  let a = rnd(mn, mx), b = rnd(mn, mx);
+  if (!cfg.neg && a < b) [a, b] = [b, a];
+  return { a, b };
+}
+
 // ===== GENERATORS =====
 function genAdd(count = 12) {
   const tasks = [];
   const mn = getMin(), mx = getMax();
   for (let i = 0; i < count; i++) {
-    const a = rnd(mn, mx);
-    const b = rnd(mn, mx - (a > 0 ? a : 0));
+    const { a, b } = makeAddPair(mn, mx, cfg.cross);
     tasks.push({ a, b, op: '+', answer: a + b });
   }
   return tasks;
@@ -963,9 +988,7 @@ function genSub(count = 12) {
   const tasks = [];
   const mn = getMin(), mx = getMax();
   for (let i = 0; i < count; i++) {
-    let a = rnd(mn, mx);
-    let b = rnd(mn, mx);
-    if (!cfg.neg && a < b) [a, b] = [b, a]; // ensure non-negative result
+    const { a, b } = makeSubPair(mn, mx, cfg.cross);
     tasks.push({ a, b, op: '−', answer: a - b });
   }
   return tasks;
@@ -976,20 +999,33 @@ function genMix(count = 6) {
   const mn = getMin(), mx = getMax();
   for (let i = 0; i < count; i++) {
     const isAdd = Math.random() > 0.5;
-    let a, b, answer, op, tries = 0;
+    let a, b, op, tries = 0;
     do {
-      if (isAdd) {
-        a = rnd(mn, mx);
-        b = rnd(mn, mx - (a > 0 ? a : 0));
-        answer = a + b; op = '+';
-      } else {
-        a = rnd(mn, mx); b = rnd(mn, mx);
-        if (!cfg.neg && a < b) [a, b] = [b, a];
-        answer = a - b; op = '−';
-      }
+      ({ a, b } = isAdd ? makeAddPair(mn, mx, cfg.cross) : makeSubPair(mn, mx, cfg.cross));
+      op = isAdd ? '+' : '−';
       tries++;
     } while (b === 0 && tries < 50); // b=0 esetén mindkét jel helyes lenne, elkerüljük
-    tasks.push({ a, b, op, answer });
+    tasks.push({ a, b, op, answer: op === '+' ? a + b : a - b });
+  }
+  return tasks;
+}
+
+// Open sentences ("nyitott mondatok"): one of the two operands is hidden in a
+// box and the child must figure out what fits. The hidden slot is random.
+function genOpen(count = 6) {
+  const tasks = [];
+  const mn = getMin(), mx = getMax();
+  for (let i = 0; i < count; i++) {
+    const isAdd = Math.random() > 0.5;
+    let a, b, tries = 0;
+    do {
+      ({ a, b } = isAdd ? makeAddPair(mn, mx, cfg.cross) : makeSubPair(mn, mx, cfg.cross));
+      tries++;
+    } while (b === 0 && tries < 50); // b=0 → triviális/kétértelmű, kerüljük
+    const op = isAdd ? '+' : '−';
+    const result = isAdd ? a + b : a - b;
+    const missing = Math.random() > 0.5 ? 'a' : 'b';
+    tasks.push({ a, b, op, result, missing, answer: missing === 'a' ? a : b });
   }
   return tasks;
 }
@@ -998,7 +1034,8 @@ function genWords(count = 4) {
   const mn = Math.max(1, getMin()), mx = getMax();
   const shuffled = [...wordTemplates].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count).map(t => {
-    const task = t.gen(mn, mx);
+    const { a, b } = t.op === '+' ? makeAddPair(mn, mx, cfg.cross) : makeSubPair(mn, mx, cfg.cross);
+    const task = t.build(a, b);
     return { ...task, emoji: t.emoji }; // attach correct emoji to task data
   });
 }
@@ -1058,6 +1095,21 @@ function renderMix() {
     </div>`;
   }).join('');
   clearScore('mix');
+}
+
+function renderOpen() {
+  document.getElementById('openGrid').innerHTML = openTasks.map((t, i) => {
+    const box = `<input class="task-input" type="number" id="open-inp-${i}" placeholder="?" onkeydown="handleEnter(event,'open-inp-${i+1}')">`;
+    const num = v => `<span style="font-size:1.3rem;font-weight:900;">${v}</span>`;
+    const aPart = t.missing === 'a' ? box : num(t.a);
+    const bPart = t.missing === 'b' ? box : num(t.b);
+    return `
+    <div class="task-item" id="open-${i}">
+      ${aPart} <span style="font-weight:900;">${t.op}</span> ${bPart} <span style="font-weight:900;">=</span> ${num(t.result)}
+      <span class="task-feedback" id="open-fb-${i}"></span>
+    </div>`;
+  }).join('');
+  clearScore('open');
 }
 
 function renderWords() {
@@ -1151,6 +1203,21 @@ function checkSection(section) {
     });
   }
 
+  if (section === 'open') {
+    openTasks.forEach((t, i) => {
+      const inp = document.getElementById(`open-inp-${i}`);
+      const box = document.getElementById(`open-${i}`);
+      const fb  = document.getElementById(`open-fb-${i}`);
+      if (inp.value === '') return;
+      total++;
+      const ok = parseInt(inp.value) === t.answer;
+      box.classList.toggle('correct', ok); box.classList.toggle('wrong', !ok);
+      inp.classList.toggle('correct', ok); inp.classList.toggle('wrong', !ok);
+      fb.textContent = ok ? '✅' : '❌';
+      if (ok) correct++;
+    });
+  }
+
   if (section === 'word') {
     wordTasks.forEach((t, i) => {
       const inp = document.getElementById(`word-inp-${i}`);
@@ -1172,6 +1239,7 @@ function regenSection(section) {
   if (section === 'add')  { addTasks  = genAdd(12);  renderAdd(); }
   if (section === 'sub')  { subTasks  = genSub(12);  renderSub(); }
   if (section === 'mix')  { mixTasks  = genMix(6);   renderMix(); }
+  if (section === 'open') { openTasks = genOpen(6);  renderOpen(); }
   if (section === 'word') { wordTasks = genWords(4); renderWords(); }
   document.getElementById('scorePanel').classList.remove('visible');
 }
@@ -1181,15 +1249,16 @@ function generateAll() {
   addTasks  = genAdd(12);
   subTasks  = genSub(12);
   mixTasks  = genMix(6);
+  openTasks = genOpen(6);
   wordTasks = genWords(4);
-  renderAdd(); renderSub(); renderMix(); renderWords(); renderNumLine();
+  renderAdd(); renderSub(); renderMix(); renderOpen(); renderWords(); renderNumLine();
   document.getElementById('scorePanel').classList.remove('visible');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ===== CHECK ALL =====
 function checkAll() {
-  ['add','sub','mix','word'].forEach(checkSection);
+  ['add','sub','mix','open','word'].forEach(checkSection);
 
   let correct = 0, answered = 0;
   addTasks.forEach((t, i) => {
@@ -1205,6 +1274,11 @@ function checkAll() {
   mixTasks.forEach(t => {
     if (!t.selected) return; answered++;
     if (t.selected === t.op || t.b === 0) correct++;
+  });
+  openTasks.forEach((t, i) => {
+    const v = document.getElementById(`open-inp-${i}`).value;
+    if (v === '') return; answered++;
+    if (parseInt(v) === t.answer) correct++;
   });
   wordTasks.forEach((t, i) => {
     const v = document.getElementById(`word-inp-${i}`).value;
@@ -1240,7 +1314,7 @@ function resetAll() {
   document.querySelectorAll('.sign-btn').forEach(btn => btn.className = 'sign-btn');
   mixTasks.forEach(t => delete t.selected);
   document.getElementById('scorePanel').classList.remove('visible');
-  ['add','sub','mix','word'].forEach(clearScore);
+  ['add','sub','mix','open','word'].forEach(clearScore);
 }
 
 // ===== CONFETTI =====
@@ -1270,6 +1344,13 @@ function handleEnter(e, nextId) {
 document.getElementById('settingMin').value = cfg.min;
 document.getElementById('settingMax').value = cfg.max;
 document.getElementById('settingNeg').checked = cfg.neg;
+document.getElementById('settingCross').checked = cfg.cross;
+// Dátum alapból a mai nap (pl. 2026. 05. 31.)
+(function setToday() {
+  const d = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  document.getElementById('dateField').value = `${d.getFullYear()}. ${pad(d.getMonth() + 1)}. ${pad(d.getDate())}.`;
+})();
 updateSubtitle();
 generateAll();
 </script>
