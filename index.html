@@ -550,10 +550,10 @@
     margin-bottom: 12px;
     position: relative;
   }
-  .word-problem:nth-child(1) { background: var(--word1-bg); border-left: 5px solid var(--yellow); }
-  .word-problem:nth-child(2) { background: var(--word2-bg); border-left: 5px solid var(--green); }
-  .word-problem:nth-child(3) { background: var(--word3-bg); border-left: 5px solid var(--purple); }
-  .word-problem:nth-child(4) { background: var(--word4-bg); border-left: 5px solid var(--pink); }
+  .word-problem:nth-child(4n+1) { background: var(--word1-bg); border-left: 5px solid var(--yellow); }
+  .word-problem:nth-child(4n+2) { background: var(--word2-bg); border-left: 5px solid var(--green); }
+  .word-problem:nth-child(4n+3) { background: var(--word3-bg); border-left: 5px solid var(--purple); }
+  .word-problem:nth-child(4n)   { background: var(--word4-bg); border-left: 5px solid var(--pink); }
 
   .word-text {
     font-size: 1rem;
@@ -1012,7 +1012,7 @@ function genMix(count = 6) {
 
 // Open sentences ("nyitott mondatok"): one of the two operands is hidden in a
 // box and the child must figure out what fits. The hidden slot is random.
-function genOpen(count = 6) {
+function genOpen(count = 12) {
   const tasks = [];
   const mn = getMin(), mx = getMax();
   for (let i = 0; i < count; i++) {
@@ -1239,8 +1239,8 @@ function regenSection(section) {
   if (section === 'add')  { addTasks  = genAdd(12);  renderAdd(); }
   if (section === 'sub')  { subTasks  = genSub(12);  renderSub(); }
   if (section === 'mix')  { mixTasks  = genMix(6);   renderMix(); }
-  if (section === 'open') { openTasks = genOpen(6);  renderOpen(); }
-  if (section === 'word') { wordTasks = genWords(4); renderWords(); }
+  if (section === 'open') { openTasks = genOpen(12); renderOpen(); }
+  if (section === 'word') { wordTasks = genWords(6); renderWords(); }
   document.getElementById('scorePanel').classList.remove('visible');
 }
 
@@ -1249,8 +1249,8 @@ function generateAll() {
   addTasks  = genAdd(12);
   subTasks  = genSub(12);
   mixTasks  = genMix(6);
-  openTasks = genOpen(6);
-  wordTasks = genWords(4);
+  openTasks = genOpen(12);
+  wordTasks = genWords(6);
   renderAdd(); renderSub(); renderMix(); renderOpen(); renderWords(); renderNumLine();
   document.getElementById('scorePanel').classList.remove('visible');
   window.scrollTo({ top: 0, behavior: 'smooth' });
